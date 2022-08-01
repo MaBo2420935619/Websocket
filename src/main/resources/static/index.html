@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>websoket</title>
+	<link rel="stylesheet" type="text/css" href="/style.css">
+</head>
+<body>
+
+    <div class="container">
+        <div class="content">
+		<input style="width:300px" id="url" value="ws://127.0.0.1:8080/websocket/2/2" /> <button id="" onclick="loginOn()">连接</button>  <button id="" onclick="closeSocket()">断开</button>
+            <div class="item item-center"><span>昨天 12:35</span></div>
+            <div class="item item-center"><span>你已添加了凡繁烦，现在可以开始聊天了。</span></div>
+            <div class="item item-left"><div class="avatar"><img src="https://tupian.qqw21.com/article/UploadPic/2020-5/202052121413474800.jpg" /></div><div class="bubble bubble-left">您好,我在武汉，你可以直接送过来吗，我有时间的话，可以自己过去拿<br/>！！！<br/>123</div></div>
+            <div class="item item-right"><div class="bubble bubble-right">hello<br/>你好呀</div><div class="avatar"><img src="https://shijuepi.com/uploads/allimg/200818/1-200QQ40138.jpg" /></div></div>
+            <div class="item item-center"><span>昨天 13:15</span></div>
+            <div class="item item-right"><div class="bubble bubble-right">刚刚不在，不好意思</div><div class="avatar"><img src="https://shijuepi.com/uploads/allimg/200818/1-200QQ40138.jpg" /></div></div>
+            <div class="item item-left"><div class="avatar"><img src="https://tupian.qqw21.com/article/UploadPic/2020-5/202052121413474800.jpg" /></div><div class="bubble bubble-left">没事<br/>你继续！</div></div>
+            <div class="item item-left"><div class="avatar"><img src="https://tupian.qqw21.com/article/UploadPic/2020-5/202052121413474800.jpg" /></div><div class="bubble bubble-left">看到了<br/>在下面</div></div>
+            <div class="item item-left"><div class="avatar"><img src="https://tupian.qqw21.com/article/UploadPic/2020-5/202052121413474800.jpg" /></div><div class="bubble bubble-left">你发一个<br/>刚刚网卡了</div></div>
+            <div class="item item-right"><div class="bubble bubble-right">可以<br/>一会儿再发给你</div><div class="avatar"><img src="https://shijuepi.com/uploads/allimg/200818/1-200QQ40138.jpg" /></div></div>
+        </div>
+        <div class="input-area">
+            <textarea name="text" id="textarea"></textarea>
+            <div class="button-area">
+                <button id="send-btn" onclick="send()">发 送</button>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+		var socket;
+	
+		var userId;
+		var connect=0;
+		var url;
+		function closeSocket(){
+			socket.close();
+		}
+        function send(){
+		if(connect==0){
+			alert("请先连接服务器");
+		}
+		
+			let text = document.querySelector('#textarea').value;
+			socket.send(text);
+		}
+		function loginOn(){
+			if(typeof(WebSocket) == "undefined") {
+            console.log("您的浏览器不支持WebSocket");
+        }else{
+            console.log("您的浏览器支持WebSocket");
+            //实现化WebSocket对象，指定要连接的服务器地址与端口  建立连接
+            //等同于socket = new WebSocket("ws://localhost:8888/xxxx/im/25");
+            //var socketUrl="${request.contextPath}/im/"+$("#userId").val();
+			 var socketUrl=document.getElementById("url").value; 
+				url=socketUrl;
+			var arr = url.split("/");
+			 console.log(arr);
+			userId=arr[arr.length-1];
+			console.log(userId);
+            //var socketUrl="ws://127.0.0.1:8080/websocket/2/2";
+            //socketUrl=socketUrl.replace("https","ws").replace("http","ws");
+            console.log(socketUrl);
+            if(socket!=null){
+                socket.close();
+                socket=null;
+            }
+            socket = new WebSocket(socketUrl);
+            //打开事件
+            socket.onopen = function() {
+                console.log("websocket已打开");
+				connect=1;
+				//alert("服务器连接成功");
+                //socket.send("这是来自客户端的消息" + location.href + new Date());
+            };
+            //获得消息事件
+            socket.onmessage = function(event) {
+				console.info(event.data);
+				var received_msg = event.data;
+					var jsonValue = JSON.parse(received_msg);
+					console.log(jsonValue);
+					var msg = jsonValue.msg;
+					var user=jsonValue.sender;
+					let item2 = document.createElement('div');
+					item2.className = 'item item-center';
+					let date=jsonValue.date;
+					item2.innerHTML = `<div class="item item-center"><span>${date}</span></div>`;
+					document.querySelector('.content').appendChild(item2);
+					
+					let item = document.createElement('div');
+					if(user==userId){
+						item.className = 'item item-right';
+						item.innerHTML = `<div class="bubble bubble-left">${msg}</div><div class="avatar"><img src="https://shijuepi.com/uploads/allimg/200818/1-200QQ40138.jpg" /></div>`;
+						
+					}
+					else{
+						item.className = 'item item-left';
+						item.innerHTML = `<div class="avatar"><img src="https://tupian.qqw21.com/article/UploadPic/2020-5/202052121413474800.jpg" /></div><div class="bubble bubble-right">${msg}</div>`;
+					
+					}
+					
+					document.querySelector('.content').appendChild(item);
+					document.querySelector('#textarea').value = '';
+					document.querySelector('#textarea').focus();
+					//滚动条置底
+					let height = document.querySelector('.content').scrollHeight;
+					document.querySelector(".content").scrollTop = height;
+                //发现消息进入    开始处理前端触发逻辑
+            };
+            //关闭事件
+            socket.onclose = function() {
+				alert("websocket已关闭")
+                console.log("websocket已关闭");
+            };
+            //发生了错误事件
+            socket.onerror = function() {
+                console.log("websocket发生了错误");
+            }
+        }
+		}
+
+	
+
+    </script>
+</body>
+</html>
