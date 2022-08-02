@@ -11,6 +11,8 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.CopyOnWriteArraySet;
 //测试网站 http://www.websocket-test.com/
 // wss://la23972002.goho.co//websocket/2/2
@@ -19,6 +21,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @ServerEndpoint(value = "/websocket/{chatroom}/{userId}")
 @Component
 public class WebSocketServer {
+    private static SimpleDateFormat sdf=new SimpleDateFormat("MM月dd日 HH:mm:ss");
     private  static  WebsocketProducer websocketProducer;
 
     @Autowired
@@ -59,41 +62,6 @@ public class WebSocketServer {
         } catch (IOException e) {
             log.error("websocket IO异常");
         }
-//        boolean login=false;
-//        WebSocketServer loginUser=null;
-//        for (WebSocketServer item : webSocketSet) {
-//            try {
-//                if (item.userId.equals(userId)) {
-//                    login=true;
-//                    loginUser=item;
-//                   break;
-//                }
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        if (!login){
-//
-//        }
-//        else {
-//            try {
-//                sendMessage("当前用户已经存在是否继续登录");
-//            } catch (IOException e) {
-//                log.error("websocket IO异常");
-//            }
-//           //旧用户离线
-//            sendMessage(loginUser.session,"其他用户登录,你被挤下线");
-//            onClose(loginUser.session ,loginUser.chatroom,loginUser.userId);
-//            webSocketSet.add(this);
-//            addOnlineCount();
-//            try {
-//                sendMessage("连接成功");
-//            } catch (IOException e) {
-//                log.error("websocket IO异常");
-//            }
-//        }
-
-
 
     }
 
@@ -138,8 +106,9 @@ public class WebSocketServer {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("sender",item.userId);
                     jsonObject.put("msg",message);
-//                    WebSocketServer.sendChatroom(item.chatroom,jsonObject);//单机方式
-                    websocketProducer.sendMsg(item.chatroom,item.userId,message);
+                    jsonObject.put("date",sdf.format(new Date()));
+                    WebSocketServer.sendChatroom(item.chatroom,jsonObject);//单机方式
+                    websocketProducer.sendMsg(item.chatroom,item.userId,message);//分布式部署
                 }
             } catch (Exception e) {
                e.printStackTrace();
