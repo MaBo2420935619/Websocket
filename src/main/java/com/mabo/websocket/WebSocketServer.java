@@ -16,7 +16,7 @@ import java.util.Date;
 import java.util.concurrent.CopyOnWriteArraySet;
 //测试网站 http://www.websocket-test.com/
 // wss://la23972002.goho.co//websocket/2/2
-                        //ws://127.0.0.1:8080/websocket/2/2
+                        //ws://127.0.0.1:8080/websocket/房间号/用户id
 @Slf4j
 @ServerEndpoint(value = "/websocket/{chatroom}/{userId}")
 @Component
