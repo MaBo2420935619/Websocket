@@ -2,7 +2,7 @@ package com.mabo.websocket;
 
 
 import com.alibaba.fastjson.JSONObject;
-import com.mabo.rockMQ.producer.WebsocketProducer;
+//import com.mabo.rockMQ.producer.WebsocketProducer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,12 +22,12 @@ import java.util.concurrent.CopyOnWriteArraySet;
 @Component
 public class WebSocketServer {
     private static SimpleDateFormat sdf=new SimpleDateFormat("MM月dd日 HH:mm:ss");
-    private  static  WebsocketProducer websocketProducer;
-
-    @Autowired
-    public void setWebsocketProducer(WebsocketProducer websocketProducer) {
-        WebSocketServer.websocketProducer = websocketProducer;
-    }
+//    private  static  WebsocketProducer websocketProducer;
+//
+//    @Autowired
+//    public void setWebsocketProducer(WebsocketProducer websocketProducer) {
+//        WebSocketServer.websocketProducer = websocketProducer;
+//    }
 
     //静态变量，用来记录当前在线连接数。应该把它设计成线程安全的。
     public static int onlineCount = 0;
@@ -57,11 +57,11 @@ public class WebSocketServer {
         log.info("用户名  userId==== " + userId + "  chatroom==== " + chatroom+ "  session==== " + session.getId());
         webSocketSet.add(this);     //加入set中
         addOnlineCount();           //在线数加1
-        try {
-            sendMessage("连接成功");
-        } catch (IOException e) {
-            log.error("websocket IO异常");
-        }
+//        try {
+//            sendMessage("连接成功");
+//        } catch (IOException e) {
+//            log.error("websocket IO异常");
+//        }
 
     }
 
@@ -108,7 +108,7 @@ public class WebSocketServer {
                     jsonObject.put("msg",message);
                     jsonObject.put("date",sdf.format(new Date()));
                     WebSocketServer.sendChatroom(item.chatroom,jsonObject);//单机方式
-                    websocketProducer.sendMsg(item.chatroom,item.userId,message);//分布式部署
+//                    websocketProducer.sendMsg(item.chatroom,item.userId,message);//分布式部署
                 }
             } catch (Exception e) {
                e.printStackTrace();
